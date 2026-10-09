@@ -25,11 +25,11 @@ export class MobileLayout {
   private unsubscribeLang: (() => void) | null = null;
 
   private static readonly NAV_ITEMS: NavItem[] = [
-    { href: '#/', icon: '🏠', labelKey: 'home', route: 'home' },
-    { href: '#/articles', icon: '📰', labelKey: 'articles', route: 'articles' },
-    { href: '#/bookmarks', icon: '🔖', labelKey: 'bookmarks', route: 'bookmarks' },
-    { href: '#/subscriptions', icon: '📡', labelKey: 'subscriptions', route: 'subscriptions' },
-    { href: '#/settings', icon: '⚙️', labelKey: 'settings', route: 'settings' },
+    { href: '/', icon: '🏠', labelKey: 'home', route: 'home' },
+    { href: '/articles', icon: '📰', labelKey: 'articles', route: 'articles' },
+    { href: '/bookmarks', icon: '🔖', labelKey: 'bookmarks', route: 'bookmarks' },
+    { href: '/subscriptions', icon: '📡', labelKey: 'subscriptions', route: 'subscriptions' },
+    { href: '/settings', icon: '⚙️', labelKey: 'settings', route: 'settings' },
   ];
 
   constructor(currentRoute: Route) {

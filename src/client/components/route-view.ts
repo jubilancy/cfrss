@@ -6,7 +6,7 @@
  */
 
 import { Route } from '../router.js';
-import { navigate } from '../router.js';
+import { navigate, articlePath } from '../router.js';
 import { getCurrentArticleId } from '../state.js';
 import { t } from '../services/i18n.js';
 import { DailyDigestCard } from './digest/DailyDigestCard.js';
@@ -104,7 +104,13 @@ export class RouteView {
           container: view,
           feedId: this.route.query.subscription ?? null,
           categoryId: this.route.query.category ?? null,
-          onSelect: (id) => navigate(`/articles/${id}`),
+          onSelect: (id) =>
+            navigate(
+              articlePath(id, {
+                feedId: this.route.query.subscription ?? null,
+                categoryId: this.route.query.category ?? null,
+              }),
+            ),
         });
         await list.init();
         if (gen !== this.generation) {

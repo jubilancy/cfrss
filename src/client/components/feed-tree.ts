@@ -1,7 +1,7 @@
 /**
  * FeedTree — Folo-style subscription tree for the desktop sidebar.
  * Collapsible categories with unread counts, feeds with favicons,
- * and an "all articles" root entry. Read-only (management lives in #/subscriptions).
+ * and an "all articles" root entry. Read-only (management lives in /subscriptions).
  */
 
 import { getSubscriptions } from '../services/api.js';

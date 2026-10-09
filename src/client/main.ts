@@ -1,6 +1,6 @@
 /**
  * SPA entry point.
- * Initializes the app shell, sets up hash-based routing, and detects viewport layout.
+ * Initializes the app shell, sets up path-based routing, and detects viewport layout.
  * An auth gate runs first: the Worker requires a Bearer token on every API call.
  */
 
@@ -25,11 +25,6 @@ async function startApp(appEl: HTMLElement): Promise<void> {
 
   const shell = new AppShell(appEl);
   shell.init();
-
-  // Ensure default hash route is set
-  if (!window.location.hash || window.location.hash === '') {
-    window.location.hash = '#/';
-  }
 
   // Initialize PWA support (Service Worker registration, update detection)
   initPWA();
