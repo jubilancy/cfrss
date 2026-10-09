@@ -14,6 +14,10 @@ export interface PublicFeed {
   homeUrl: string;
   /** The feed's own address. */
   selfUrl: string;
+  /** Square channel image, shown beside the feed in readers (a PNG works everywhere). */
+  iconUrl: string;
+  /** Small square image for lists (JSON Feed `favicon`). */
+  faviconUrl: string;
   items: CollectionArticle[];
 }
 
@@ -89,6 +93,11 @@ export function renderRss(feed: PublicFeed): string {
     <link>${escapeXml(feed.homeUrl)}</link>
     <description>${escapeXml(feed.description)}</description>
     <atom:link href="${escapeXml(feed.selfUrl)}" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>${escapeXml(feed.iconUrl)}</url>
+      <title>${escapeXml(feed.title)}</title>
+      <link>${escapeXml(feed.homeUrl)}</link>
+    </image>
 ${newest ? `    <lastBuildDate>${newest.toUTCString()}</lastBuildDate>\n` : ''}${items}
   </channel>
 </rss>
@@ -103,6 +112,8 @@ export function renderJsonFeed(feed: PublicFeed): string {
       home_page_url: feed.homeUrl,
       feed_url: feed.selfUrl,
       description: feed.description,
+      icon: feed.iconUrl,
+      favicon: feed.faviconUrl,
       items: feed.items.map((item) => {
         const date = toDate(item.publishedAt);
         const excerpt = toExcerpt(item.summary);
