@@ -73,6 +73,7 @@ describe('Public feeds', () => {
     expect(xml).toContain('<title>Cooking</title>');
     expect(xml).toContain('https://example.com/a1');
     expect(xml).toContain('An excerpt');
+    expect(xml).toContain('<url>http://localhost/icons/icon-256x256.png</url>');
 
     const json = await anon('/tag/Cooking/feed.json');
     expect(json.status).toBe(200);
