@@ -25,6 +25,21 @@ import {
   handleAddBookmark,
   handleRemoveBookmark,
 } from './handlers/bookmarks';
+import {
+  handleListTags,
+  handleListTagArticles,
+  handleDeleteTag,
+  handleListFolders,
+  handleCreateFolder,
+  handleRenameFolder,
+  handleDeleteFolder,
+  handleListFolderArticles,
+  handleAddArticleToFolder,
+  handleRemoveArticleFromFolder,
+  handleGetArticleOrganization,
+  handleAddArticleTag,
+  handleRemoveArticleTag,
+} from './handlers/collections';
 import { handleGetGitHubConfig, handleSetGitHubConfig, handleTestGitHubConfig } from './handlers/github-config';
 import {
   handleGetTTSConfig,
@@ -88,6 +103,21 @@ app.get('/api/bookmarks', handleListBookmarks);
 app.get('/api/articles/:id/bookmark', handleGetBookmarkState);
 app.put('/api/articles/:id/bookmark', handleAddBookmark);
 app.delete('/api/articles/:id/bookmark', handleRemoveBookmark);
+
+// --- Tags and folders ---
+app.get('/api/tags', handleListTags);
+app.get('/api/tags/:slug/articles', handleListTagArticles);
+app.delete('/api/tags/:id', handleDeleteTag);
+app.get('/api/folders', handleListFolders);
+app.post('/api/folders', handleCreateFolder);
+app.put('/api/folders/:id', handleRenameFolder);
+app.delete('/api/folders/:id', handleDeleteFolder);
+app.get('/api/folders/:slug/articles', handleListFolderArticles);
+app.put('/api/folders/:id/articles/:articleId', handleAddArticleToFolder);
+app.delete('/api/folders/:id/articles/:articleId', handleRemoveArticleFromFolder);
+app.get('/api/articles/:id/organize', handleGetArticleOrganization);
+app.post('/api/articles/:id/tags', handleAddArticleTag);
+app.delete('/api/articles/:id/tags/:tagId', handleRemoveArticleTag);
 
 // --- LLM Features ---
 app.post('/api/llm/summarize', handleSummarizeArticle);

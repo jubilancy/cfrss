@@ -63,6 +63,39 @@ export async function setupTestDatabase(db: D1Database): Promise<void> {
 
     CREATE INDEX IF NOT EXISTS idx_bookmarks_created ON bookmarks(created_at DESC);
 
+    CREATE TABLE IF NOT EXISTS tags (
+      id TEXT PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE COLLATE NOCASE,
+      name TEXT NOT NULL CHECK(length(name) >= 1 AND length(name) <= 50),
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS article_tags (
+      article_id TEXT NOT NULL,
+      tag_id TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (article_id, tag_id),
+      FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
+      FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS folders (
+      id TEXT PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE COLLATE NOCASE,
+      name TEXT NOT NULL CHECK(length(name) >= 1 AND length(name) <= 50),
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS folder_articles (
+      folder_id TEXT NOT NULL,
+      article_id TEXT NOT NULL,
+      added_at TEXT NOT NULL DEFAULT (datetime('now')),
+      PRIMARY KEY (folder_id, article_id),
+      FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE CASCADE,
+      FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS llm_configs (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
