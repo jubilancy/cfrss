@@ -19,7 +19,7 @@ const feed = (items = [item()]): PublicFeed => ({
   description: 'Articles tagged Cooking',
   homeUrl: 'https://rss.example/tag/Cooking',
   selfUrl: 'https://rss.example/tag/Cooking/feed.xml',
-  iconUrl: 'https://rss.example/icons/icon-256x256.png',
+  iconUrl: 'https://rss.example/icons/icon-512x512.png',
   faviconUrl: 'https://rss.example/icons/icon-96x96.png',
   items,
 });
@@ -60,7 +60,7 @@ describe('renderRss', () => {
   it('carries the channel image so readers show the icon', () => {
     const xml = renderRss(feed());
     expect(xml).toContain('<image>');
-    expect(xml).toContain('<url>https://rss.example/icons/icon-256x256.png</url>');
+    expect(xml).toContain('<url>https://rss.example/icons/icon-512x512.png</url>');
   });
 
   it('never includes full article content', () => {
@@ -79,7 +79,7 @@ describe('renderJsonFeed', () => {
   it('follows JSON Feed 1.1', () => {
     const json = JSON.parse(renderJsonFeed(feed()));
     expect(json.version).toBe('https://jsonfeed.org/version/1.1');
-    expect(json.icon).toBe('https://rss.example/icons/icon-256x256.png');
+    expect(json.icon).toBe('https://rss.example/icons/icon-512x512.png');
     expect(json.favicon).toBe('https://rss.example/icons/icon-96x96.png');
     expect(json.feed_url).toBe('https://rss.example/tag/Cooking/feed.xml'.replace('.xml', '.xml'));
     expect(json.items[0]).toMatchObject({

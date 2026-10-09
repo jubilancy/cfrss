@@ -52,7 +52,7 @@ function build(
       description: describe,
       homeUrl: `${origin}${pagePath}`,
       selfUrl: `${origin}${pagePath}/feed.${format === 'xml' ? 'xml' : 'json'}`,
-      iconUrl: `${origin}/icons/icon-256x256.png`,
+      iconUrl: `${origin}/icons/icon-512x512.png`,
       faviconUrl: `${origin}/icons/icon-96x96.png`,
       items,
     },
