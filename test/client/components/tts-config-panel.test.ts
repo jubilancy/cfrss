@@ -137,7 +137,7 @@ describe('TTSConfigPanel', () => {
     const labels = el.findAll((e) => e.className.includes('tts-config-panel__label'))
       .map((l) => l.textContent);
     expect(labels).toContain('Service URL');
-    expect(labels).toContain('API KEY');
+    expect(labels).toContain('API Key');
 
     const urlInput = el.findAll((e) => e.type === 'url')[0];
     expect(urlInput.value).toBe('https://tts.example.com');
