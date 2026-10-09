@@ -16,6 +16,8 @@ import {
   removeArticleTag,
   renameFolder,
   deleteFolder,
+  setFolderPublic,
+  setTagPublic,
   type CollectionArticleInfo,
   type FolderInfo,
   type TagInfo,
@@ -129,6 +131,10 @@ export class CollectionView {
     }
     this.element.appendChild(header);
 
+    if (this.collection && !this.loading) {
+      this.element.appendChild(this.renderPublishBar());
+    }
+
     const scroll = document.createElement('div');
     scroll.className = 'bookmarks-view__scroll';
     const list = document.createElement('div');
@@ -161,6 +167,61 @@ export class CollectionView {
     for (const article of this.articles) {
       list.appendChild(this.renderCard(article));
     }
+  }
+
+  /** Public feed switch, plus the feed links once it is on. */
+  private renderPublishBar(): HTMLElement {
+    const collection = this.collection!;
+    const bar = document.createElement('div');
+    bar.className = 'collection-view__publish';
+
+    const label = document.createElement('label');
+    label.className = 'collection-view__switch';
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = collection.isPublic;
+    const text = document.createElement('span');
+    text.textContent = t('public_feed');
+    label.appendChild(box);
+    label.appendChild(text);
+    bar.appendChild(label);
+
+    box.addEventListener('change', () => {
+      const wanted = box.checked;
+      box.disabled = true;
+      const request = this.kind === 'tag' ? setTagPublic(collection.id, wanted) : setFolderPublic(collection.id, wanted);
+      request
+        .then(() => {
+          collection.isPublic = wanted;
+        })
+        .catch(() => {
+          box.checked = !wanted;
+          window.alert(t('public_feed_failed'));
+        })
+        .finally(() => {
+          if (!this.destroyed) this.render();
+        });
+    });
+
+    if (collection.isPublic) {
+      const base = this.kind === 'tag' ? `/tag/${encodeURIComponent(collection.slug)}` : `/${encodeURIComponent(collection.slug)}`;
+      const links = document.createElement('div');
+      links.className = 'collection-view__links';
+      for (const [name, file] of [[t('public_feed_rss'), 'feed.xml'], [t('public_feed_json'), 'feed.json']]) {
+        const a = document.createElement('a');
+        a.href = `${base}/${file}`;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = `${name}: ${window.location.origin}${base}/${file}`;
+        links.appendChild(a);
+      }
+      bar.appendChild(links);
+      const hint = document.createElement('p');
+      hint.className = 'collection-view__hint';
+      hint.textContent = t('public_feed_hint');
+      bar.appendChild(hint);
+    }
+    return bar;
   }
 
   private makeToolButton(label: string, glyph: string, onClick: () => void): HTMLButtonElement {

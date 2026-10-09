@@ -176,6 +176,11 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
     library_empty_folders: 'No folders yet',
     library_empty_tags: 'No tags yet',
     added_to_list: 'Added',
+    public_feed: 'Public feed',
+    public_feed_hint: 'Anyone with the link can read titles, links and short excerpts. Full articles are never shared.',
+    public_feed_rss: 'RSS',
+    public_feed_json: 'JSON',
+    public_feed_failed: 'Could not change the public feed. Please try again.',
 
     // Loading / error states
     loading: 'Loading…',

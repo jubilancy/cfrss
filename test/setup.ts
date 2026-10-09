@@ -67,6 +67,7 @@ export async function setupTestDatabase(db: D1Database): Promise<void> {
       id TEXT PRIMARY KEY,
       slug TEXT NOT NULL UNIQUE COLLATE NOCASE,
       name TEXT NOT NULL CHECK(length(name) >= 1 AND length(name) <= 50),
+      is_public INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -84,6 +85,7 @@ export async function setupTestDatabase(db: D1Database): Promise<void> {
       slug TEXT NOT NULL UNIQUE COLLATE NOCASE,
       name TEXT NOT NULL CHECK(length(name) >= 1 AND length(name) <= 50),
       sort_order INTEGER NOT NULL DEFAULT 0,
+      is_public INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 

@@ -39,7 +39,10 @@ import {
   handleGetArticleOrganization,
   handleAddArticleTag,
   handleRemoveArticleTag,
+  handleSetTagPublic,
+  handleSetFolderPublic,
 } from './handlers/collections';
+import { handleTagFeed, handleFolderFeed } from './handlers/public-feeds';
 import { handleGetGitHubConfig, handleSetGitHubConfig, handleTestGitHubConfig } from './handlers/github-config';
 import {
   handleGetTTSConfig,
@@ -115,9 +118,17 @@ app.delete('/api/folders/:id', handleDeleteFolder);
 app.get('/api/folders/:slug/articles', handleListFolderArticles);
 app.put('/api/folders/:id/articles/:articleId', handleAddArticleToFolder);
 app.delete('/api/folders/:id/articles/:articleId', handleRemoveArticleFromFolder);
+app.put('/api/tags/:id/public', handleSetTagPublic);
+app.put('/api/folders/:id/public', handleSetFolderPublic);
 app.get('/api/articles/:id/organize', handleGetArticleOrganization);
 app.post('/api/articles/:id/tags', handleAddArticleTag);
 app.delete('/api/articles/:id/tags/:tagId', handleRemoveArticleTag);
+
+// --- Public feeds (no login; only tags and folders you switched on) ---
+app.get('/tag/:slug/feed.xml', handleTagFeed('xml'));
+app.get('/tag/:slug/feed.json', handleTagFeed('json'));
+app.get('/:slug/feed.xml', handleFolderFeed('xml'));
+app.get('/:slug/feed.json', handleFolderFeed('json'));
 
 // --- LLM Features ---
 app.post('/api/llm/summarize', handleSummarizeArticle);

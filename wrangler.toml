@@ -17,7 +17,8 @@ CRON_MAX_FEEDS = "10"
 [assets]
 directory = "./public"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*"]
+# The feed paths go to the Worker first so public tag and folder feeds can be served.
+run_worker_first = ["/api/*", "/tag/*/feed.xml", "/tag/*/feed.json", "/*/feed.xml", "/*/feed.json"]
 
 [[d1_databases]]
 binding = "DB"
