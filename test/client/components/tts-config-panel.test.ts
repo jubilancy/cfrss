@@ -107,10 +107,10 @@ function installDom(): void {
   };
 }
 
-/** Import the panel with the UI language pinned to Chinese (matches assertions). */
+/** Import the panel with the UI language pinned to English (matches assertions). */
 async function loadPanel(): Promise<typeof import('../../../src/client/components/settings/TTSConfigPanel')['TTSConfigPanel']> {
   const i18n = await import('../../../src/client/services/i18n');
-  i18n.initI18n('zh');
+  i18n.initI18n('en');
   const mod = await import('../../../src/client/components/settings/TTSConfigPanel');
   return mod.TTSConfigPanel;
 }
@@ -136,7 +136,7 @@ describe('TTSConfigPanel', () => {
 
     const labels = el.findAll((e) => e.className.includes('tts-config-panel__label'))
       .map((l) => l.textContent);
-    expect(labels).toContain('服务地址');
+    expect(labels).toContain('Service URL');
     expect(labels).toContain('API KEY');
 
     const urlInput = el.findAll((e) => e.type === 'url')[0];
@@ -148,7 +148,7 @@ describe('TTSConfigPanel', () => {
     // Several hints exist now (voice + token) — pick the token one.
     const hints = el.findAll((e) => e.className.includes('tts-config-panel__hint'))
       .map((h) => h.textContent);
-    expect(hints.some((h) => h.includes('已保存'))).toBe(true);
+    expect(hints.some((h) => h.includes('A key is saved'))).toBe(true);
   });
 
   it('rejects a URL without protocol and does not call the API', async () => {
@@ -200,7 +200,7 @@ describe('TTSConfigPanel', () => {
 
     // success status rendered and token input reset
     const successEl = el.find((e) => e.className.includes('tts-config-panel__success'));
-    expect(successEl?.textContent).toContain('已保存');
+    expect(successEl?.textContent).toContain('TTS configuration saved');
     expect(tokenInput.value).toBe('');
   });
 
@@ -212,14 +212,14 @@ describe('TTSConfigPanel', () => {
     fetchCalls = [];
 
     const testBtn = el.findAll((e) => e.tagName === 'BUTTON')
-      .find((b) => b.textContent === '测试')!;
+      .find((b) => b.textContent === 'Test')!;
     testBtn.dispatch('click');
     await flush();
 
     const post = fetchCalls.find((c) => c.url === '/api/config/tts/test');
     expect(post).toBeDefined();
     const result = el.find((e) => e.className.includes('tts-config-panel__test-result'));
-    expect(result?.textContent).toContain('语音服务连接成功');
+    expect(result?.textContent).toContain('TTS service connected');
   });
 
   it('renders a voice select with an auto option and grouped voices', async () => {
@@ -233,18 +233,18 @@ describe('TTSConfigPanel', () => {
     // "Auto" is the first option and the default selection
     const options = select!.findAll((e) => e.tagName === 'OPTION');
     expect(options[0].value).toBe('auto');
-    expect(options[0].textContent).toBe('自动识别（按语言）');
+    expect(options[0].textContent).toBe('Auto (by language)');
     expect(select!.value).toBe('auto');
 
     // Curated voices are grouped by language family
     const groups = select!.findAll((e) => e.tagName === 'OPTGROUP');
     const groupLabels = groups.map((g) => g.label);
-    expect(groupLabels).toContain('普通话（大陆）');
-    expect(groupLabels).toContain('英语');
-    expect(groupLabels).toContain('粤语（中国香港）');
+    expect(groupLabels).toContain('Mandarin (Mainland China)');
+    expect(groupLabels).toContain('English');
+    expect(groupLabels).toContain('Cantonese (Hong Kong, China)');
 
     // The Chinese group exposes multiple voices including Xiaoxiao
-    const zhGroup = groups.find((g) => g.label === '普通话（大陆）')!;
+    const zhGroup = groups.find((g) => g.label === 'Mandarin (Mainland China)')!;
     const zhIds = zhGroup.findAll((e) => e.tagName === 'OPTION').map((o) => o.value);
     expect(zhIds).toContain('zh-CN-XiaoxiaoNeural');
     expect(zhIds).toContain('zh-CN-YunxiNeural');
@@ -305,15 +305,15 @@ describe('TTSConfigPanel', () => {
 
     const hintText = () => el.findAll((e) => e.className.includes('tts-config-panel__hint'))
       .map((h) => h.textContent)
-      .find((text) => text.includes('音色') || text.includes('全文'))!;
+      .find((text) => text.includes('Auto picks') || text.includes('without switching'))!;
 
-    expect(hintText()).toContain('自动识别');
+    expect(hintText()).toContain('Auto picks');
 
     const select = el.find((e) => e.tagName === 'SELECT' && e.id === 'settings-tts-voice')!;
     select.dispatch('change', { target: { value: 'zh-CN-YunxiNeural' } });
     await flush();
 
-    expect(hintText()).toContain('全文');
-    expect(hintText()).not.toContain('自动识别');
+    expect(hintText()).toContain('without switching');
+    expect(hintText()).not.toContain('Auto picks');
   });
 });

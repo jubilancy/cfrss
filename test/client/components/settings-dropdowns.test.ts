@@ -167,39 +167,3 @@ describe('ThemeToggle (dropdown)', () => {
   });
 });
 
-describe('LanguageSwitch (dropdown)', () => {
-  beforeEach(() => {
-    vi.resetModules();
-    fetchCalls = [];
-    themeStored = {};
-    installDom();
-  });
-
-  it('renders a select with zh and en options', async () => {
-    const { LanguageSwitch } = await import('../../../src/client/components/settings/LanguageSwitch');
-    const el = new LanguageSwitch().getElement() as unknown as StubEl;
-
-    const options = el.findAll((e) => e.tagName === 'OPTION');
-    expect(options.map((o) => o.value)).toEqual(['zh', 'en']);
-    expect(options.map((o) => o.textContent)).toEqual(['中文', 'English']);
-  });
-
-  it('switches language and persists it on change', async () => {
-    const i18n = await import('../../../src/client/services/i18n');
-    i18n.setLanguage('en');
-
-    const { LanguageSwitch } = await import('../../../src/client/components/settings/LanguageSwitch');
-    const el = new LanguageSwitch().getElement() as unknown as StubEl;
-
-    const select = el.find((e) => e.tagName === 'SELECT')!;
-    select.value = 'zh';
-    select.dispatch('change');
-
-    await Promise.resolve();
-    expect(i18n.getLanguage()).toBe('zh');
-
-    const call = fetchCalls.find((c) => c.url === '/api/config/language');
-    expect(call).toBeDefined();
-    expect(call!.body).toEqual({ language: 'zh' });
-  });
-});

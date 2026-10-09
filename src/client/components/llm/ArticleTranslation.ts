@@ -12,7 +12,7 @@
  * Requirements: 9.1, 9.2, 9.3, 9.4, 9.5
  */
 
-import { t, getLanguage, type SupportedLanguage } from '../../services/i18n.js';
+import { t } from '../../services/i18n.js';
 import {
   TARGET_LANGUAGES,
   TARGET_LANGUAGE_LABELS,
@@ -53,8 +53,7 @@ function resolveInitialTargetLanguage(): TargetLanguage {
   } catch {
     // localStorage unavailable — fall through
   }
-  const uiLang: SupportedLanguage = getLanguage();
-  return uiLang === 'zh' ? 'zh' : 'en';
+  return 'en';
 }
 
 function resolveInitialDisplayMode(): TranslationDisplayMode {

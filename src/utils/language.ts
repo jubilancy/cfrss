@@ -3,16 +3,12 @@
  * Shared between client and server code.
  */
 
-export type SupportedLanguage = 'zh' | 'en';
+export type SupportedLanguage = 'en';
 
 /**
- * Detect language preference from a navigator.language value.
- * If the value starts with 'zh' (e.g., 'zh-CN', 'zh-TW', 'zh'), returns 'zh'.
- * Otherwise returns 'en'.
+ * The interface is English-only. Kept as a function so additional UI
+ * languages can be added later without touching callers.
  */
-export function detectLanguage(navigatorLang: string): SupportedLanguage {
-  if (navigatorLang.startsWith('zh')) {
-    return 'zh';
-  }
+export function detectLanguage(_navigatorLang: string): SupportedLanguage {
   return 'en';
 }
