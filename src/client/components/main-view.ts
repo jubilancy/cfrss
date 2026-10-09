@@ -4,11 +4,11 @@
  * Stays mounted across home/articles/article-detail routes; only the
  * selection and the reader react to route changes.
  *
- * Filter state lives in the route query (?subscription= / ?category=) so it
- * survives opening an article (article-detail keeps the query).
+ * Filter state lives in the URL path (/feed/:id or /category/:id) so it
+ * survives opening an article (/feed/:id/articles/:articleId).
  */
 
-import { navigate, type Route } from '../router.js';
+import { navigate, listPath, articlePath, type Route } from '../router.js';
 import { ArticlePane } from './article-pane.js';
 import { FeedTree } from './feed-tree.js';
 import { ArticleView } from './article/ArticleView.js';
@@ -32,13 +32,6 @@ function filterFromRoute(route: Route): PaneFilter {
     feedId: route.query.subscription ?? null,
     categoryId: route.query.category ?? null,
   };
-}
-
-/** Build the query string preserving the filter for detail URLs. */
-function filterQuery(filter: PaneFilter): string {
-  if (filter.feedId) return `?subscription=${filter.feedId}`;
-  if (filter.categoryId) return `?category=${filter.categoryId}`;
-  return '';
 }
 
 export class MainView {
@@ -83,11 +76,11 @@ export class MainView {
     this.tree = new FeedTree(treeHost, this.treeSelectionFromFilter(this.currentFilter), (selection) => {
       // Tree selection is the single source of truth: reflect it into the route
       if (selection === null) {
-        navigate('/articles');
+        navigate(listPath({ feedId: null, categoryId: null }));
       } else if (selection.startsWith('cat:')) {
-        navigate(`/articles?category=${selection.slice(4)}`);
+        navigate(listPath({ feedId: null, categoryId: selection.slice(4) }));
       } else {
-        navigate(`/articles?subscription=${selection}`);
+        navigate(listPath({ feedId: selection, categoryId: null }));
       }
     });
 
@@ -104,7 +97,7 @@ export class MainView {
     if (gen !== this.generation) return;
 
     this.pane = new ArticlePane(paneHost, this.currentFilter, {
-      onSelect: (id) => navigate(`/articles/${id}${filterQuery(this.currentFilter)}`),
+      onSelect: (id) => navigate(articlePath(id, this.currentFilter)),
       feedTitleOf: (subscriptionId) =>
         this.feeds.find((f) => f.id === subscriptionId)?.title ?? t('articles'),
       feedUrlOf: (subscriptionId) =>

@@ -2,6 +2,10 @@ name = "cfrss"
 main = "src/index.ts"
 compatibility_date = "2024-12-30"
 
+[build]
+# Build the browser bundle on every deploy and every preview upload
+command = "npm run build:client"
+
 # ===== 定时任务：每小时整点自动抓取订阅新文章（新文章以未读状态呈现） =====
 [triggers]
 crons = ["0 * * * *"]

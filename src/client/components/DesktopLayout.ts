@@ -103,7 +103,7 @@ export class DesktopLayout {
     for (const item of DesktopLayout.RAIL_ITEMS) {
       const el = document.createElement('a');
       el.className = `nav-rail__item${item.activeFor.has(this.currentRoute.path) ? ' active' : ''}`;
-      el.href = `#${item.route}`;
+      el.href = item.route;
       el.setAttribute('aria-label', t(item.labelKey));
       el.innerHTML = `
         <span class="nav-rail__icon">${item.icon}</span>
