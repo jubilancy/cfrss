@@ -50,10 +50,16 @@ describe('Router - parseHash', () => {
     expect(route.params).toEqual({});
   });
 
-  it('returns home for unknown routes', () => {
-    const route = parseHash('#/unknown');
+  it('returns home for unknown routes with more than one segment', () => {
+    const route = parseHash('#/unknown/deeper/path');
     expect(route.path).toBe('home');
     expect(route.params).toEqual({});
+  });
+
+  it('treats an unknown single segment as a folder name', () => {
+    const route = parseHash('#/unknown');
+    expect(route.path).toBe('folder');
+    expect(route.params).toEqual({ slug: 'unknown' });
   });
 
   it('handles article IDs with special characters', () => {
