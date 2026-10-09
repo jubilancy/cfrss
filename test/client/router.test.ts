@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseHash, parsePath, listPath, articlePath } from '../../src/client/router';
+import { parseHash, parsePath, listPath, articlePath, tagPath, folderPath } from '../../src/client/router';
 
 describe('Router - parseHash', () => {
   it('parses empty hash as home route', () => {
@@ -133,5 +133,48 @@ describe('Router - path builders', () => {
     expect(articlePath('a1', { feedId: 'f1', categoryId: null })).toBe('/feed/f1/articles/a1');
     expect(articlePath('a1', { feedId: null, categoryId: 'c1' })).toBe('/category/c1/articles/a1');
     expect(parsePath(articlePath('a1', { feedId: 'f1', categoryId: null })).params.id).toBe('a1');
+  });
+});
+
+describe('Router - tags, folders and the library', () => {
+  it('parses a tag page', () => {
+    const route = parsePath('/tag/cooking');
+    expect(route.path).toBe('tag');
+    expect(route.params).toEqual({ slug: 'cooking' });
+  });
+
+  it('parses a folder at the root, keeping its capitalisation', () => {
+    const route = parsePath('/TBR');
+    expect(route.path).toBe('folder');
+    expect(route.params).toEqual({ slug: 'TBR' });
+  });
+
+  it('decodes encoded names', () => {
+    expect(parsePath('/%E9%A3%9F%E8%B0%B1').params).toEqual({ slug: '食谱' });
+    expect(parsePath('/tag/caf%C3%A9').params).toEqual({ slug: 'café' });
+  });
+
+  it('parses the library page', () => {
+    expect(parsePath('/library').path).toBe('library');
+  });
+
+  it('keeps app paths as app pages, never folders', () => {
+    expect(parsePath('/settings').path).toBe('settings');
+    expect(parsePath('/bookmarks').path).toBe('bookmarks');
+    expect(parsePath('/SETTINGS').path).toBe('home');
+  });
+
+  it('does not treat reserved or file-like paths as folders', () => {
+    expect(parsePath('/tag').path).toBe('home');
+    expect(parsePath('/feed').path).toBe('home');
+    expect(parsePath('/api').path).toBe('home');
+    expect(parsePath('/manifest.json').path).toBe('home');
+  });
+
+  it('builds tag and folder paths', () => {
+    expect(tagPath('cooking')).toBe('/tag/cooking');
+    expect(folderPath('TBR')).toBe('/TBR');
+    expect(parsePath(folderPath('食谱')).params.slug).toBe('食谱');
+    expect(parsePath(tagPath('café')).params.slug).toBe('café');
   });
 });

@@ -2,6 +2,9 @@
  * Simple client-side router using real URL paths (History API).
  *
  * Routes:
+ *   /tag/:slug                    articles with one tag (slug is case-insensitive)
+ *   /:folder                       articles in one folder, e.g. /TBR
+ *   /library                      all folders and tags
  *   /                              home (main view)
  *   /articles                      all articles
  *   /feed/:feedId                  articles of one subscription
@@ -15,6 +18,8 @@
  * bookmarks keep working. Names such as `feed`, `category` and `tag` are
  * reserved for the app and cannot be used as folder names later.
  */
+
+import { isReservedSlug } from '../utils/slug.js';
 
 export interface Route {
   path: string;
@@ -37,6 +42,8 @@ export interface RouteFilter {
 interface RouteDef {
   pattern: RegExp;
   name: string;
+  /** Return false to skip this route for a match (used to keep folders off app paths). */
+  accept?: (match: RegExpMatchArray) => boolean;
   /** Turn the regex match into params and filter query values. */
   build: (match: RegExpMatchArray) => { params?: Record<string, string>; query?: Record<string, string> };
 }
@@ -60,8 +67,25 @@ const ROUTES: RouteDef[] = [
   { pattern: /^\/digest\/?$/, name: 'digest', build: () => ({}) },
   { pattern: /^\/subscriptions\/?$/, name: 'subscriptions', build: () => ({}) },
   { pattern: /^\/settings\/?$/, name: 'settings', build: () => ({}) },
+  { pattern: /^\/library\/?$/, name: 'library', build: () => ({}) },
+  { pattern: /^\/tag\/([^/]+)\/?$/, name: 'tag', build: (m) => ({ params: { slug: safeDecode(m[1]) } }) },
+  // A single path segment is a folder, unless it is a name the app owns.
+  {
+    pattern: /^\/([^/.]+)\/?$/,
+    name: 'folder',
+    accept: (m) => !isReservedSlug(safeDecode(m[1])),
+    build: (m) => ({ params: { slug: safeDecode(m[1]) } }),
+  },
   { pattern: /^\/?$/, name: 'home', build: () => ({}) },
 ];
+
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
 
 function parseQuery(raw: string | undefined): Record<string, string> {
   const query: Record<string, string> = {};
@@ -80,7 +104,7 @@ let listeners: RouteChangeHandler[] = [];
 function matchRoute(pathname: string): { name: string; params: Record<string, string>; query: Record<string, string> } | null {
   for (const route of ROUTES) {
     const match = pathname.match(route.pattern);
-    if (match) {
+    if (match && (!route.accept || route.accept(match))) {
       const built = route.build(match);
       return { name: route.name, params: built.params ?? {}, query: built.query ?? {} };
     }
@@ -109,6 +133,16 @@ export function parsePath(pathWithQuery: string): Route {
 export function parseHash(hash: string): Route {
   const stripped = (hash || '').replace(/^#/, '');
   return parsePath(stripped || '/');
+}
+
+/** Path of a tag page, e.g. /tag/cooking. */
+export function tagPath(slug: string): string {
+  return `/tag/${encodeURIComponent(slug)}`;
+}
+
+/** Path of a folder page, e.g. /TBR. */
+export function folderPath(slug: string): string {
+  return `/${encodeURIComponent(slug)}`;
 }
 
 /** Path of the article list for a filter. */

@@ -783,3 +783,106 @@ export async function generateDailyDigest(): Promise<DailyDigest> {
   const data = await apiRequest<{ digest: DailyDigest }>('POST', '/api/llm/digest/generate');
   return data.digest;
 }
+
+// === Tags and folders ===
+
+export interface TagInfo {
+  id: string;
+  slug: string;
+  name: string;
+  count: number;
+}
+
+export interface FolderInfo {
+  id: string;
+  slug: string;
+  name: string;
+  order: number;
+  count: number;
+}
+
+/** Article card data returned by the tag and folder article lists. */
+export interface CollectionArticleInfo {
+  id: string;
+  subscriptionId: string;
+  title: string;
+  author: string;
+  publishedAt: string;
+  summary: string;
+  sourceUrl: string;
+  isRead: boolean;
+  addedAt: string;
+}
+
+export async function getTags(): Promise<TagInfo[]> {
+  const data = await apiRequest<{ tags: TagInfo[] }>('GET', '/api/tags');
+  return data.tags;
+}
+
+export async function getFolders(): Promise<FolderInfo[]> {
+  const data = await apiRequest<{ folders: FolderInfo[] }>('GET', '/api/folders');
+  return data.folders;
+}
+
+export async function createFolder(name: string): Promise<FolderInfo> {
+  const data = await apiRequest<{ folder: FolderInfo }>('POST', '/api/folders', { name });
+  return data.folder;
+}
+
+export async function renameFolder(id: string, name: string): Promise<FolderInfo> {
+  const data = await apiRequest<{ folder: FolderInfo }>('PUT', `/api/folders/${encodeURIComponent(id)}`, { name });
+  return data.folder;
+}
+
+export async function deleteFolder(id: string): Promise<void> {
+  await apiRequest<{ success: boolean }>('DELETE', `/api/folders/${encodeURIComponent(id)}`);
+}
+
+export async function getTagArticles(
+  slug: string
+): Promise<{ tag: TagInfo; articles: CollectionArticleInfo[] }> {
+  return apiRequest('GET', `/api/tags/${encodeURIComponent(slug)}/articles`);
+}
+
+export async function getFolderArticles(
+  slug: string
+): Promise<{ folder: FolderInfo; articles: CollectionArticleInfo[] }> {
+  return apiRequest('GET', `/api/folders/${encodeURIComponent(slug)}/articles`);
+}
+
+/** The tags and folders one article is in. */
+export async function getArticleOrganization(
+  articleId: string
+): Promise<{ tags: TagInfo[]; folders: FolderInfo[] }> {
+  return apiRequest('GET', `/api/articles/${encodeURIComponent(articleId)}/organize`);
+}
+
+export async function addArticleTag(articleId: string, name: string): Promise<TagInfo> {
+  const data = await apiRequest<{ tag: TagInfo }>(
+    'POST',
+    `/api/articles/${encodeURIComponent(articleId)}/tags`,
+    { name }
+  );
+  return data.tag;
+}
+
+export async function removeArticleTag(articleId: string, tagId: string): Promise<void> {
+  await apiRequest<{ success: boolean }>(
+    'DELETE',
+    `/api/articles/${encodeURIComponent(articleId)}/tags/${encodeURIComponent(tagId)}`
+  );
+}
+
+export async function addArticleToFolder(folderId: string, articleId: string): Promise<void> {
+  await apiRequest<{ success: boolean }>(
+    'PUT',
+    `/api/folders/${encodeURIComponent(folderId)}/articles/${encodeURIComponent(articleId)}`
+  );
+}
+
+export async function removeArticleFromFolder(folderId: string, articleId: string): Promise<void> {
+  await apiRequest<{ success: boolean }>(
+    'DELETE',
+    `/api/folders/${encodeURIComponent(folderId)}/articles/${encodeURIComponent(articleId)}`
+  );
+}
