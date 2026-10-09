@@ -3,35 +3,18 @@
 Ideas for this fork. Nothing here is started unless it says so.
 Base URL plan: **rss.glosse.me**.
 
-## Next up: tags and folders
+## Next up: tags and folders, part 2
 
-Built in stages, each one a small change that can be looked at before it
-goes live.
+Tags, folders and public feeds are built (see Done). What is left:
 
-1. **Clean slash URLs, no `?operators` and no `#`.**
-   - Tags: `rss.glosse.me/tag/cooking`
-   - Folders: `rss.glosse.me/TBR`
-   - Switch the router from hash (`#/`) to path routing. The Worker already
-     serves the app for unknown paths.
-   - Reserve names that belong to the app (`settings`, `tag`, `api`, `feed`,
-     `bookmarks`, `digest`, `subscriptions`, ...) so a folder can't take one.
-2. **Tags and folders on individual articles.**
-   - Folders are hand-curated lists (TBR, Read later, Recipes).
-   - Tags are stackable labels (cooking, rust, politics).
-   - Categories stay as they are, grouping subscriptions.
-   - Start with **hand-added folders only**.
-3. **Public feeds for every tag and folder.**
-   - Slash-style: `/tag/cooking/feed.xml` and `/TBR/feed.xml`.
-   - JSON versions for the main site: `/tag/cooking.json` and `/TBR.json`.
-   - Each tag or folder is **private by default**, with a public switch.
-   - Public feeds carry title, link, source and a short excerpt, not full
-     article text.
-   - Send CORS headers on the JSON endpoints so a main site can call them.
-
-### Later: rule-based folders
-
-- Folders that fill themselves from rules, such as **"everything from feed X"**.
-  Rules could also match a tag, a keyword, or a category.
+- **Folders and tags in the sidebar tree**, next to the feeds and categories,
+  so they can be reached without opening the Library page.
+- **Rule-based folders.** Folders that fill themselves from rules, such as
+  **"everything from feed X"**. Rules could also match a tag, a keyword, or a
+  category. Hand-added folders stay as they are.
+- **More from public feeds:** a short note on the tag or folder page about who
+  can see it, and optionally a nicer human-readable view of the feed when it is
+  opened in a browser.
 
 ## Domain and URLs
 
@@ -72,6 +55,11 @@ goes live.
 
 ## Housekeeping
 
+- **Swap `public/icons/logo.svg` for the sun.** It is still the sparkle logo.
+  The web app manifest and a browser `mask-icon` setting point at it. Needs an
+  SVG or PNG of the sun.
+- **Manifest theme color.** Still the old blue; the interface is now terracotta.
+
 - **Working preview builds.** Previews have no app JavaScript, so they show a
   blank page. Fix: in the Worker's Settings, Builds, set the Build command to
   `npm run build:client`.
@@ -101,6 +89,21 @@ goes live.
   one (konpeito does this).
 
 ## Done
+
+- **Clean slash URLs** instead of `#/`: `/articles`, `/feed/:id`,
+  `/category/:id`, `/library`, `/tag/cooking`, `/TBR`. Old `#/` links
+  still work.
+- **Tags and folders** on individual articles, an Organize panel in the reader,
+  a Library page, and tag and folder pages. Hand-added folders only. Folder
+  names stay off app paths such as `/settings`.
+- **Public feeds** for any tag or folder: `/tag/cooking/feed.xml`,
+  `/tag/cooking/feed.json`, `/TBR/feed.xml`, `/TBR/feed.json`. Private by
+  default, a switch on each page turns one on. Title, link, date, author and a
+  short excerpt only.
+- **Feed and app icons** use the uploaded sun art; feeds carry it as their
+  channel image.
+- Working previews for every branch (the Worker config builds the browser
+  bundle itself).
 
 - English-only interface (Chinese stays as an article translation target).
 - Magazine-style redesign: warm palette, serif headlines, roomier cards.
