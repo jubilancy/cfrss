@@ -114,7 +114,8 @@ export class LibraryView {
     const n = document.createElement('span');
     n.className = 'library-count';
     n.textContent = String(count);
-    a.append(name, n);
+    a.appendChild(name);
+    a.appendChild(n);
     return a;
   }
 
@@ -129,7 +130,8 @@ export class LibraryView {
     const btn = document.createElement('button');
     btn.type = 'submit';
     btn.textContent = t('create');
-    form.append(input, btn);
+    form.appendChild(input);
+    form.appendChild(btn);
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = input.value.trim();

@@ -76,7 +76,8 @@ export class OrganizePanel {
       remove.setAttribute('aria-label', `${t('remove_from_collection')}: ${tag.name}`);
       remove.textContent = '✕';
       remove.addEventListener('click', () => void this.removeTag(tag));
-      chip.append(link, remove);
+      chip.appendChild(link);
+      chip.appendChild(remove);
       chips.appendChild(chip);
     }
     tagsSection.appendChild(chips);
@@ -90,7 +91,8 @@ export class OrganizePanel {
       datalist.appendChild(option);
     }
     const tagForm = this.inlineForm(t('add_tag_placeholder'), t('add_tag'), (name) => this.addTag(name), listId);
-    tagsSection.append(datalist, tagForm);
+    tagsSection.appendChild(datalist);
+    tagsSection.appendChild(tagForm);
     this.element.appendChild(tagsSection);
 
     // ---- Folders ----
@@ -111,7 +113,9 @@ export class OrganizePanel {
       open.className = 'organize-folder__open';
       open.textContent = '↗';
       open.setAttribute('aria-label', folder.name);
-      label.append(box, name, open);
+      label.appendChild(box);
+      label.appendChild(name);
+      label.appendChild(open);
       list.appendChild(label);
     }
     foldersSection.appendChild(list);
@@ -155,7 +159,8 @@ export class OrganizePanel {
     const btn = document.createElement('button');
     btn.type = 'submit';
     btn.textContent = buttonLabel;
-    form.append(input, btn);
+    form.appendChild(input);
+    form.appendChild(btn);
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = input.value.trim();

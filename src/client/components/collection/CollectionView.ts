@@ -217,7 +217,11 @@ export class CollectionView {
     excerpt.className = 'bookmark-card__excerpt';
     excerpt.textContent = stripHtml(article.summary || '').slice(0, 140);
 
-    textWrap.append(source, title, excerpt);
+    textWrap.appendChild(source);
+
+    textWrap.appendChild(title);
+
+    textWrap.appendChild(excerpt);
     card.appendChild(textWrap);
 
     const thumbSrc = firstImage(article.summary || '');
