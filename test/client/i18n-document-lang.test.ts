@@ -3,9 +3,7 @@
  *
  * Regression: `index.html` hardcodes `lang="en"` (correct for the default
  * locale on first paint), but nothing updated it when the user switched
- * language. A Chinese UI therefore still declared itself English, so screen
- * readers announced it with English phonetics and the browser applied English
- * font-selection / line-breaking rules to CJK text.
+ * language. The UI is now English-only, so the attribute is always "en".
  *
  * The Workers test pool has no DOM, so a stub that records attribute writes is
  * installed before the module is imported.
@@ -55,20 +53,6 @@ describe('i18n document language', () => {
 
     initI18n('zh-CN');
 
-    expect(html.attrs['lang']).toBe('zh');
-  });
-
-  it('updates <html lang> when the language is switched', async () => {
-    const html = installDom();
-    const { initI18n, setLanguage } = await import('../../src/client/services/i18n');
-
-    initI18n('en');
-    expect(html.attrs['lang']).toBe('en');
-
-    setLanguage('zh');
-    expect(html.attrs['lang']).toBe('zh');
-
-    setLanguage('en');
     expect(html.attrs['lang']).toBe('en');
   });
 

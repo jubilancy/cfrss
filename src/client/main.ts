@@ -10,7 +10,7 @@ import { LoginGate, getStoredToken, clearStoredToken, verifyToken } from './comp
 import { installFetchAuth } from './services/api.js';
 import { initPWA } from './services/pwa.js';
 import { initTheme } from './services/theme.js';
-import { initI18n, loadLanguageFromServer } from './services/i18n.js';
+import { initI18n } from './services/i18n.js';
 
 /**
  * Start the application (after successful authentication).
@@ -19,11 +19,7 @@ async function startApp(appEl: HTMLElement): Promise<void> {
   // Attach the Bearer token to every /api/* request (many components use raw fetch)
   installFetchAuth();
 
-  // Initialize i18n from the browser language, then apply the preference
-  // stored in Config_Store BEFORE the first render so no mixed-language
-  // first paint occurs.
   initI18n();
-  await loadLanguageFromServer();
 
   initRouter();
 
@@ -59,7 +55,6 @@ function showLogin(appEl: HTMLElement): void {
  * Bootstrap the application: authenticate first, then start the app shell.
  */
 function bootstrap(): void {
-  // Detect the interface language before anything renders (incl. the login gate)
   initI18n();
 
   const appEl = document.getElementById('app');

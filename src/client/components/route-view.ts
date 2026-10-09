@@ -15,7 +15,6 @@ import { ArticleView } from './article/ArticleView.js';
 import { BookmarksView } from './bookmark/BookmarksView.js';
 import { MobileArticleList } from './mobile/MobileArticleList.js';
 import { ThemeToggle } from './settings/ThemeToggle.js';
-import { LanguageSwitch } from './settings/LanguageSwitch.js';
 import { LLMConfigPanel } from './settings/LLMConfigPanel.js';
 import { GitHubConfigPanel } from './settings/GitHubConfigPanel.js';
 import { TTSConfigPanel } from './settings/TTSConfigPanel.js';
@@ -181,7 +180,6 @@ export class RouteView {
       component: { getElement(): HTMLElement; destroy(): void };
     }> = [
       { icon: '🎨', titleKey: 'theme', descKey: 'settings_theme_desc', component: new ThemeToggle() },
-      { icon: '🌐', titleKey: 'language', descKey: 'settings_language_desc', component: new LanguageSwitch() },
       { icon: '🤖', titleKey: 'llm_config', descKey: 'settings_llm_desc', component: new LLMConfigPanel() },
       { icon: '🔊', titleKey: 'tts_config', descKey: 'settings_tts_desc', component: new TTSConfigPanel() },
       { icon: '🐙', titleKey: 'github_config', descKey: 'settings_github_desc', component: new GitHubConfigPanel() },
