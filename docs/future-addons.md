@@ -7,5 +7,5 @@ Ideas planned for this fork. Not started unless marked otherwise.
   one of them). Add more languages there and in the translation dropdown.
 - **More interface languages.** The interface is English-only. `i18n.ts` is
   structured so extra dictionaries can be added later.
-- **Magazine-style redesign.** Serif headlines, generous whitespace, large
-  article images, warm palette (in progress).
+- **Magazine-style redesign (done, see styles.css).** Serif headlines, generous whitespace, large
+  article images, warm palette.
