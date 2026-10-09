@@ -14,6 +14,8 @@ export interface Tag {
   slug: string;
   name: string;
   count: number;
+  /** Whether the tag publishes a public RSS and JSON feed. */
+  isPublic: boolean;
 }
 
 export interface Folder {
@@ -22,6 +24,8 @@ export interface Folder {
   name: string;
   order: number;
   count: number;
+  /** Whether the folder publishes a public RSS and JSON feed. */
+  isPublic: boolean;
 }
 
 /** Article card metadata, the same shape the bookmarks list uses. */
@@ -90,41 +94,55 @@ const ARTICLE_COLUMNS = `a.id, a.subscription_id, a.title, a.author, a.published
 export async function listTags(db: D1Database): Promise<Tag[]> {
   const result = await db
     .prepare(
-      `SELECT t.id, t.slug, t.name, COUNT(at.article_id) AS count
+      `SELECT t.id, t.slug, t.name, t.is_public, COUNT(at.article_id) AS count
        FROM tags t
        LEFT JOIN article_tags at ON at.tag_id = t.id
        GROUP BY t.id
        ORDER BY t.name COLLATE NOCASE ASC`
     )
-    .all<{ id: string; slug: string; name: string; count: number }>();
-  return (result.results ?? []).map((r) => ({ id: r.id, slug: r.slug, name: r.name, count: r.count }));
+    .all<{ id: string; slug: string; name: string; is_public: number; count: number }>();
+  return (result.results ?? []).map((r) => ({
+    id: r.id,
+    slug: r.slug,
+    name: r.name,
+    count: r.count,
+    isPublic: r.is_public === 1,
+  }));
 }
 
 export async function getTagBySlug(db: D1Database, slug: string): Promise<Tag | null> {
   const row = await db
     .prepare(
-      `SELECT t.id, t.slug, t.name, COUNT(at.article_id) AS count
+      `SELECT t.id, t.slug, t.name, t.is_public, COUNT(at.article_id) AS count
        FROM tags t LEFT JOIN article_tags at ON at.tag_id = t.id
        WHERE t.slug = ?
        GROUP BY t.id`
     )
     .bind(slug)
-    .first<{ id: string; slug: string; name: string; count: number }>();
-  return row ? { id: row.id, slug: row.slug, name: row.name, count: row.count } : null;
+    .first<{ id: string; slug: string; name: string; is_public: number; count: number }>();
+  return row
+    ? { id: row.id, slug: row.slug, name: row.name, count: row.count, isPublic: row.is_public === 1 }
+    : null;
 }
 
 /** Tags on one article. */
 export async function listArticleTags(db: D1Database, articleId: string): Promise<Tag[]> {
   const result = await db
     .prepare(
-      `SELECT t.id, t.slug, t.name
+      `SELECT t.id, t.slug, t.name, t.is_public
        FROM article_tags at JOIN tags t ON t.id = at.tag_id
        WHERE at.article_id = ?
        ORDER BY t.name COLLATE NOCASE ASC`
     )
     .bind(articleId)
-    .all<{ id: string; slug: string; name: string }>();
-  return (result.results ?? []).map((r) => ({ id: r.id, slug: r.slug, name: r.name, count: 0 }));
+    .all<{ id: string; slug: string; name: string; is_public: number }>();
+  return (result.results ?? []).map((r) => ({
+    id: r.id,
+    slug: r.slug,
+    name: r.name,
+    count: 0,
+    isPublic: r.is_public === 1,
+  }));
 }
 
 /**
@@ -142,14 +160,14 @@ export async function addTagToArticle(db: D1Database, articleId: string, rawName
   }
 
   let tag = await db
-    .prepare('SELECT id, slug, name FROM tags WHERE slug = ?')
+    .prepare('SELECT id, slug, name, is_public FROM tags WHERE slug = ?')
     .bind(slug)
-    .first<{ id: string; slug: string; name: string }>();
+    .first<{ id: string; slug: string; name: string; is_public: number }>();
 
   if (!tag) {
     const id = crypto.randomUUID();
     await db.prepare('INSERT INTO tags (id, slug, name) VALUES (?, ?, ?)').bind(id, slug, name).run();
-    tag = { id, slug, name };
+    tag = { id, slug, name, is_public: 0 };
   }
 
   await db
@@ -157,7 +175,7 @@ export async function addTagToArticle(db: D1Database, articleId: string, rawName
     .bind(articleId, tag.id)
     .run();
 
-  return { id: tag.id, slug: tag.slug, name: tag.name, count: 0 };
+  return { id: tag.id, slug: tag.slug, name: tag.name, count: 0, isPublic: tag.is_public === 1 };
 }
 
 /** Take a tag off one article. Returns false when the article did not have it. */
@@ -211,33 +229,43 @@ function validateFolderSlug(name: string): string {
 export async function listFolders(db: D1Database): Promise<Folder[]> {
   const result = await db
     .prepare(
-      `SELECT f.id, f.slug, f.name, f.sort_order, COUNT(fa.article_id) AS count
+      `SELECT f.id, f.slug, f.name, f.sort_order, f.is_public, COUNT(fa.article_id) AS count
        FROM folders f
        LEFT JOIN folder_articles fa ON fa.folder_id = f.id
        GROUP BY f.id
        ORDER BY f.sort_order ASC, f.name COLLATE NOCASE ASC`
     )
-    .all<{ id: string; slug: string; name: string; sort_order: number; count: number }>();
+    .all<{ id: string; slug: string; name: string; sort_order: number; is_public: number; count: number }>();
   return (result.results ?? []).map((r) => ({
     id: r.id,
     slug: r.slug,
     name: r.name,
     order: r.sort_order,
     count: r.count,
+    isPublic: r.is_public === 1,
   }));
 }
 
 export async function getFolderBySlug(db: D1Database, slug: string): Promise<Folder | null> {
   const row = await db
     .prepare(
-      `SELECT f.id, f.slug, f.name, f.sort_order, COUNT(fa.article_id) AS count
+      `SELECT f.id, f.slug, f.name, f.sort_order, f.is_public, COUNT(fa.article_id) AS count
        FROM folders f LEFT JOIN folder_articles fa ON fa.folder_id = f.id
        WHERE f.slug = ?
        GROUP BY f.id`
     )
     .bind(slug)
-    .first<{ id: string; slug: string; name: string; sort_order: number; count: number }>();
-  return row ? { id: row.id, slug: row.slug, name: row.name, order: row.sort_order, count: row.count } : null;
+    .first<{ id: string; slug: string; name: string; sort_order: number; is_public: number; count: number }>();
+  return row
+    ? {
+        id: row.id,
+        slug: row.slug,
+        name: row.name,
+        order: row.sort_order,
+        count: row.count,
+        isPublic: row.is_public === 1,
+      }
+    : null;
 }
 
 export async function createFolder(db: D1Database, rawName: unknown): Promise<Folder> {
@@ -260,7 +288,7 @@ export async function createFolder(db: D1Database, rawName: unknown): Promise<Fo
     .bind(id, slug, name, order)
     .run();
 
-  return { id, slug, name, order, count: 0 };
+  return { id, slug, name, order, count: 0, isPublic: false };
 }
 
 export async function renameFolder(db: D1Database, folderId: string, rawName: unknown): Promise<Folder> {
@@ -284,18 +312,19 @@ export async function renameFolder(db: D1Database, folderId: string, rawName: un
 
   const updated = await db
     .prepare(
-      `SELECT f.id, f.slug, f.name, f.sort_order, COUNT(fa.article_id) AS count
+      `SELECT f.id, f.slug, f.name, f.sort_order, f.is_public, COUNT(fa.article_id) AS count
        FROM folders f LEFT JOIN folder_articles fa ON fa.folder_id = f.id
        WHERE f.id = ? GROUP BY f.id`
     )
     .bind(folderId)
-    .first<{ id: string; slug: string; name: string; sort_order: number; count: number }>();
+    .first<{ id: string; slug: string; name: string; sort_order: number; is_public: number; count: number }>();
   return {
     id: folderId,
     slug,
     name,
     order: updated?.sort_order ?? 0,
     count: updated?.count ?? 0,
+    isPublic: (updated?.is_public ?? 0) === 1,
   };
 }
 
@@ -310,19 +339,20 @@ export async function deleteFolder(db: D1Database, folderId: string): Promise<bo
 export async function listArticleFolders(db: D1Database, articleId: string): Promise<Folder[]> {
   const result = await db
     .prepare(
-      `SELECT f.id, f.slug, f.name, f.sort_order
+      `SELECT f.id, f.slug, f.name, f.sort_order, f.is_public
        FROM folder_articles fa JOIN folders f ON f.id = fa.folder_id
        WHERE fa.article_id = ?
        ORDER BY f.sort_order ASC, f.name COLLATE NOCASE ASC`
     )
     .bind(articleId)
-    .all<{ id: string; slug: string; name: string; sort_order: number }>();
+    .all<{ id: string; slug: string; name: string; sort_order: number; is_public: number }>();
   return (result.results ?? []).map((r) => ({
     id: r.id,
     slug: r.slug,
     name: r.name,
     order: r.sort_order,
     count: 0,
+    isPublic: r.is_public === 1,
   }));
 }
 
@@ -375,4 +405,21 @@ export async function listFolderArticles(
     .bind(folderId, limit, offset)
     .all<ArticleRow>();
   return (result.results ?? []).map(rowToArticle);
+}
+
+// ------------------------------------------------------- public feeds ----
+
+/** Turn the public feed of a tag on or off. Returns false when the tag is missing. */
+export async function setTagPublic(db: D1Database, tagId: string, isPublic: boolean): Promise<boolean> {
+  const result = await db.prepare('UPDATE tags SET is_public = ? WHERE id = ?').bind(isPublic ? 1 : 0, tagId).run();
+  return (result.meta.changes ?? 0) > 0;
+}
+
+/** Turn the public feed of a folder on or off. Returns false when the folder is missing. */
+export async function setFolderPublic(db: D1Database, folderId: string, isPublic: boolean): Promise<boolean> {
+  const result = await db
+    .prepare('UPDATE folders SET is_public = ? WHERE id = ?')
+    .bind(isPublic ? 1 : 0, folderId)
+    .run();
+  return (result.meta.changes ?? 0) > 0;
 }

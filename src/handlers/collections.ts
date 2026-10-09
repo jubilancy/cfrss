@@ -17,6 +17,8 @@ import {
   removeArticleFromFolder,
   removeTagFromArticle,
   renameFolder,
+  setFolderPublic,
+  setTagPublic,
 } from '../services/collections';
 import { notFoundError, validationError } from '../utils/errors';
 import { parsePageLimit } from '../middleware/cpu-monitor';
@@ -132,4 +134,30 @@ export async function handleRemoveArticleTag(c: Ctx) {
   const removed = await removeTagFromArticle(c.env.DB, c.req.param('id')!, c.req.param('tagId')!);
   if (!removed) throw notFoundError('That article does not have this tag');
   return c.json({ success: true });
+}
+
+// ---- Public feeds ----
+
+async function readPublicFlag(c: Ctx): Promise<boolean> {
+  const body = await c.req.json<{ public?: unknown }>().catch(() => ({}) as { public?: unknown });
+  if (typeof body.public !== 'boolean') {
+    throw validationError('Missing or invalid "public" field. Must be true or false.');
+  }
+  return body.public;
+}
+
+/** PUT /api/tags/:id/public — { public: boolean }. Publishes or hides the tag's feed. */
+export async function handleSetTagPublic(c: Ctx) {
+  const isPublic = await readPublicFlag(c);
+  const found = await setTagPublic(c.env.DB, c.req.param('id')!, isPublic);
+  if (!found) throw notFoundError(`Tag not found: ${c.req.param('id')}`);
+  return c.json({ success: true, isPublic });
+}
+
+/** PUT /api/folders/:id/public — { public: boolean }. Publishes or hides the folder's feed. */
+export async function handleSetFolderPublic(c: Ctx) {
+  const isPublic = await readPublicFlag(c);
+  const found = await setFolderPublic(c.env.DB, c.req.param('id')!, isPublic);
+  if (!found) throw notFoundError(`Folder not found: ${c.req.param('id')}`);
+  return c.json({ success: true, isPublic });
 }

@@ -3760,3 +3760,34 @@ html, body {
   display: flex;
   gap: 8px;
 }
+
+/* Public feed switch on tag and folder pages */
+.collection-view__publish {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.collection-view__switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.collection-view__links {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.collection-view__links a {
+  overflow-wrap: anywhere;
+  color: var(--color-accent);
+}
+
+.collection-view__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}

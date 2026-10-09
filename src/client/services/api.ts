@@ -791,6 +791,8 @@ export interface TagInfo {
   slug: string;
   name: string;
   count: number;
+  /** True when the tag publishes a public RSS and JSON feed. */
+  isPublic: boolean;
 }
 
 export interface FolderInfo {
@@ -799,6 +801,8 @@ export interface FolderInfo {
   name: string;
   order: number;
   count: number;
+  /** True when the folder publishes a public RSS and JSON feed. */
+  isPublic: boolean;
 }
 
 /** Article card data returned by the tag and folder article lists. */
@@ -832,6 +836,16 @@ export async function createFolder(name: string): Promise<FolderInfo> {
 export async function renameFolder(id: string, name: string): Promise<FolderInfo> {
   const data = await apiRequest<{ folder: FolderInfo }>('PUT', `/api/folders/${encodeURIComponent(id)}`, { name });
   return data.folder;
+}
+
+/** Publish or hide the public feed of a tag. */
+export async function setTagPublic(id: string, isPublic: boolean): Promise<void> {
+  await apiRequest<{ success: boolean }>('PUT', `/api/tags/${encodeURIComponent(id)}/public`, { public: isPublic });
+}
+
+/** Publish or hide the public feed of a folder. */
+export async function setFolderPublic(id: string, isPublic: boolean): Promise<void> {
+  await apiRequest<{ success: boolean }>('PUT', `/api/folders/${encodeURIComponent(id)}/public`, { public: isPublic });
 }
 
 export async function deleteFolder(id: string): Promise<void> {
