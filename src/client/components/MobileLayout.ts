@@ -28,6 +28,7 @@ export class MobileLayout {
     { href: '/', icon: '🏠', labelKey: 'home', route: 'home' },
     { href: '/articles', icon: '📰', labelKey: 'articles', route: 'articles' },
     { href: '/bookmarks', icon: '🔖', labelKey: 'bookmarks', route: 'bookmarks' },
+    { href: '/library', icon: '📁', labelKey: 'library', route: 'library' },
     { href: '/subscriptions', icon: '📡', labelKey: 'subscriptions', route: 'subscriptions' },
     { href: '/settings', icon: '⚙️', labelKey: 'settings', route: 'settings' },
   ];
@@ -116,6 +117,9 @@ export class MobileLayout {
   private isNavItemActive(route: string): boolean {
     if (route === 'articles') {
       return this.currentRoute.path === 'articles' || this.currentRoute.path === 'article-detail';
+    }
+    if (route === 'library') {
+      return ['library', 'folder', 'tag'].includes(this.currentRoute.path);
     }
     return this.currentRoute.path === route;
   }

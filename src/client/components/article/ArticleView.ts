@@ -11,6 +11,7 @@
 import { navigate } from '../../router.js';
 import { t } from '../../services/i18n.js';
 import { getBookmarkState, addBookmark, removeBookmark } from '../../services/api.js';
+import { OrganizePanel } from './OrganizePanel.js';
 import { ArticleSummary } from '../llm/ArticleSummary.js';
 import { ArticleTranslation } from '../llm/ArticleTranslation.js';
 import { ReadAloudPlayer } from '../player/ReadAloudPlayer.js';
@@ -59,6 +60,8 @@ export class ArticleView {
   private translation: ArticleTranslation | null = null;
   private readAloudPlayer: ReadAloudPlayer | null = null;
   private llmHost: HTMLElement | null = null;
+  private organizeHost: HTMLElement | null = null;
+  private organizePanel: OrganizePanel | null = null;
   private readAloudHost: HTMLElement | null = null;
   private bodyEl: HTMLElement | null = null;
   /** Bookmark state for the current article (optimistic; synced with the API). */
@@ -102,6 +105,8 @@ export class ArticleView {
    * Clean up event listeners and gesture detectors.
    */
   destroy(): void {
+    this.organizePanel?.destroy();
+    this.organizePanel = null;
     this.teardownLlmPanels();
     this.teardownReadAloud();
     this.swipeNavigator?.detach();
@@ -184,12 +189,23 @@ export class ArticleView {
       <button class="action-btn action-read-aloud" type="button" aria-label="${t('read_aloud')}">
         <span class="action-btn__icon" aria-hidden="true">🔊</span>${t('read_aloud')}
       </button>
+      <button class="action-btn action-organize" type="button"
+              aria-label="${t('organize')}" aria-expanded="false">
+        <span class="action-btn__icon" aria-hidden="true">🏷</span>${t('organize')}
+      </button>
       <button class="action-btn action-bookmark" type="button"
               aria-label="${t('bookmark_add')}" title="${t('bookmark_add')}"
               aria-pressed="${this.bookmarked ? 'true' : 'false'}">
         <span class="action-btn__icon" aria-hidden="true">${BOOKMARK_ICON}</span>${t('bookmarks')}
       </button>
     `;
+
+    // Tags and folders panel host (opens from the Organize button)
+    this.organizePanel?.destroy();
+    this.organizePanel = null;
+    this.organizeHost = document.createElement('div');
+    this.organizeHost.className = 'article-view-organize';
+    this.organizeHost.hidden = true;
 
     // LLM panels host (summary / translation render here)
     this.llmHost = document.createElement('div');
@@ -225,6 +241,7 @@ export class ArticleView {
 
     view.appendChild(header);
     view.appendChild(actions);
+    view.appendChild(this.organizeHost);
     view.appendChild(this.llmHost);
     view.appendChild(this.readAloudHost);
     view.appendChild(body);
@@ -235,6 +252,18 @@ export class ArticleView {
 
     // Wire action button events
     this.bindActionButtons(actions);
+  }
+
+  /** Show or hide the tags and folders panel, creating it on first open. */
+  private toggleOrganize(button: HTMLElement): void {
+    if (!this.organizeHost) return;
+    const opening = this.organizeHost.hidden;
+    this.organizeHost.hidden = !opening;
+    button.classList.toggle('active', opening);
+    button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    if (opening && !this.organizePanel) {
+      this.organizePanel = new OrganizePanel(this.organizeHost, this.articleId);
+    }
   }
 
   /**
@@ -286,10 +315,12 @@ export class ArticleView {
     const summarizeBtn = actions.querySelector('.action-summarize');
     const translateBtn = actions.querySelector('.action-translate');
     const readAloudBtn = actions.querySelector('.action-read-aloud');
+    const organizeBtn = actions.querySelector('.action-organize');
 
     summarizeBtn?.addEventListener('click', () => this.toggleSummary());
     translateBtn?.addEventListener('click', () => this.toggleTranslation());
     readAloudBtn?.addEventListener('click', () => this.toggleReadAloud());
+    organizeBtn?.addEventListener('click', () => this.toggleOrganize(organizeBtn as HTMLElement));
 
     this.bookmarkBtn = actions.querySelector('.action-bookmark') as HTMLButtonElement | null;
     this.bookmarkBtn?.addEventListener('click', () => void this.toggleBookmark());

@@ -13,6 +13,8 @@ import { DailyDigestCard } from './digest/DailyDigestCard.js';
 import { SubscriptionList } from './subscription/SubscriptionList.js';
 import { ArticleView } from './article/ArticleView.js';
 import { BookmarksView } from './bookmark/BookmarksView.js';
+import { CollectionView } from './collection/CollectionView.js';
+import { LibraryView } from './collection/LibraryView.js';
 import { MobileArticleList } from './mobile/MobileArticleList.js';
 import { ThemeToggle } from './settings/ThemeToggle.js';
 import { LLMConfigPanel } from './settings/LLMConfigPanel.js';
@@ -162,6 +164,33 @@ export class RouteView {
           return;
         }
         this.mounted = bookmarks;
+        break;
+      }
+
+      case 'tag':
+      case 'folder': {
+        const collection = new CollectionView({
+          container: view,
+          kind: this.route.path,
+          slug: this.route.params.slug,
+        });
+        await collection.init();
+        if (gen !== this.generation) {
+          collection.destroy();
+          return;
+        }
+        this.mounted = collection;
+        break;
+      }
+
+      case 'library': {
+        const library = new LibraryView({ container: view });
+        await library.init();
+        if (gen !== this.generation) {
+          library.destroy();
+          return;
+        }
+        this.mounted = library;
         break;
       }
 

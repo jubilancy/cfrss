@@ -28,6 +28,7 @@ export class DesktopLayout {
   private static readonly RAIL_ITEMS: RailItem[] = [
     { route: '/articles', icon: '📰', labelKey: 'articles', activeFor: new Set(['home', 'articles', 'article-detail']) },
     { route: '/bookmarks', icon: '🔖', labelKey: 'bookmarks', activeFor: new Set(['bookmarks']) },
+    { route: '/library', icon: '📁', labelKey: 'library', activeFor: new Set(['library', 'folder', 'tag']) },
     { route: '/digest', icon: '☀️', labelKey: 'digest', activeFor: new Set(['digest']) },
     { route: '/subscriptions', icon: '📡', labelKey: 'subscriptions', activeFor: new Set(['subscriptions']) },
     { route: '/settings', icon: '⚙️', labelKey: 'settings', activeFor: new Set(['settings']) },
