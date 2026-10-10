@@ -9,6 +9,13 @@
 import { t } from '../../services/i18n.js';
 import type { Category } from '../../../types/index.js';
 
+interface FoundFeed {
+  url: string;
+  title: string;
+  source: 'direct' | 'page' | 'known' | 'guess';
+  verified: boolean;
+}
+
 export class AddSubscription {
   private element: HTMLElement;
   private categories: Category[];
@@ -17,6 +24,12 @@ export class AddSubscription {
   private error: string | null = null;
   private urlValue = '';
   private categoryValue = 'default';
+
+  // Feed finder state
+  private finderValue = '';
+  private finderLoading = false;
+  private finderResults: FoundFeed[] | null = null;
+  private finderNotes: string[] = [];
 
   constructor(categories: Category[], onAdded: () => void) {
     this.categories = categories;
@@ -31,6 +44,54 @@ export class AddSubscription {
    */
   getElement(): HTMLElement {
     return this.element;
+  }
+
+  /**
+   * Look up feeds for any website, channel or profile address.
+   */
+  private async find(): Promise<void> {
+    const text = this.finderValue.trim();
+    if (!text) return;
+
+    this.finderLoading = true;
+    this.finderResults = null;
+    this.finderNotes = [];
+    this.render();
+
+    try {
+      const res = await fetch('/api/feeds/discover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: text }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(body?.message || `Error: ${res.status}`);
+      }
+      const data = (await res.json()) as { candidates: FoundFeed[]; notes: string[] };
+      this.finderResults = data.candidates;
+      this.finderNotes = data.notes;
+    } catch (err) {
+      this.finderResults = [];
+      this.finderNotes = [err instanceof Error ? err.message : t('network_error')];
+    } finally {
+      this.finderLoading = false;
+      this.render();
+    }
+  }
+
+  /**
+   * Subscribe to one of the found feeds with the normal add flow.
+   */
+  private addFound(feed: FoundFeed): void {
+    this.urlValue = feed.url;
+    void this.submit().then(() => {
+      if (!this.error) {
+        this.finderResults = null;
+        this.finderValue = '';
+        this.render();
+      }
+    });
   }
 
   /**
@@ -91,10 +152,102 @@ export class AddSubscription {
   }
 
   /**
+   * The feed finder: type any address, get feeds to pick from.
+   */
+  private renderFinder(): HTMLElement {
+    const box = document.createElement('div');
+    box.className = 'feed-finder';
+
+    const title = document.createElement('h3');
+    title.className = 'feed-finder__title';
+    title.textContent = t('find_feed');
+    box.appendChild(title);
+
+    const hint = document.createElement('p');
+    hint.className = 'feed-finder__hint';
+    hint.textContent = t('find_feed_hint');
+    box.appendChild(hint);
+
+    const row = document.createElement('form');
+    row.className = 'feed-finder__row';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'add-subscription__input';
+    input.placeholder = t('find_feed_placeholder');
+    input.maxLength = 2048;
+    input.value = this.finderValue;
+    input.disabled = this.finderLoading;
+    input.setAttribute('aria-label', t('find_feed'));
+    input.addEventListener('input', (e) => {
+      this.finderValue = (e.target as HTMLInputElement).value;
+    });
+    const button = document.createElement('button');
+    button.type = 'submit';
+    button.className = 'btn btn--primary';
+    button.disabled = this.finderLoading;
+    button.textContent = this.finderLoading ? t('loading') : t('find');
+    row.appendChild(input);
+    row.appendChild(button);
+    row.addEventListener('submit', (e) => {
+      e.preventDefault();
+      void this.find();
+    });
+    box.appendChild(row);
+
+    for (const note of this.finderNotes) {
+      const p = document.createElement('p');
+      p.className = 'feed-finder__note';
+      p.textContent = note;
+      box.appendChild(p);
+    }
+
+    if (this.finderResults && this.finderResults.length > 0) {
+      const list = document.createElement('div');
+      list.className = 'feed-finder__results';
+      for (const feed of this.finderResults) {
+        const item = document.createElement('div');
+        item.className = 'feed-finder__result';
+
+        const text = document.createElement('div');
+        text.className = 'feed-finder__text';
+        const name = document.createElement('strong');
+        name.textContent = feed.title;
+        const url = document.createElement('span');
+        url.className = 'feed-finder__url';
+        url.textContent = feed.url;
+        text.appendChild(name);
+        text.appendChild(url);
+        if (!feed.verified) {
+          const warn = document.createElement('span');
+          warn.className = 'feed-finder__unverified';
+          warn.textContent = t('find_feed_unverified');
+          text.appendChild(warn);
+        }
+
+        const add = document.createElement('button');
+        add.type = 'button';
+        add.className = 'btn';
+        add.disabled = this.loading;
+        add.textContent = t('add');
+        add.addEventListener('click', () => this.addFound(feed));
+
+        item.appendChild(text);
+        item.appendChild(add);
+        list.appendChild(item);
+      }
+      box.appendChild(list);
+    }
+
+    return box;
+  }
+
+  /**
    * Render the form.
    */
   private render(): void {
     this.element.innerHTML = '';
+
+    this.element.appendChild(this.renderFinder());
 
     const form = document.createElement('form');
     form.className = 'add-subscription__form';

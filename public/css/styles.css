@@ -3791,3 +3791,73 @@ html, body {
   font-size: 12px;
   color: var(--color-text-muted);
 }
+
+/* Feed finder on the Subscriptions page */
+.feed-finder {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.feed-finder__title {
+  margin: 0 0 4px;
+  font-family: var(--font-serif);
+  font-size: 18px;
+}
+
+.feed-finder__hint,
+.feed-finder__note {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.feed-finder__note {
+  color: var(--color-warning);
+}
+
+.feed-finder__row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.feed-finder__row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-finder__results {
+  display: grid;
+  gap: 8px;
+}
+
+.feed-finder__result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.feed-finder__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.feed-finder__url {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.feed-finder__unverified {
+  font-size: 12px;
+  color: var(--color-warning);
+}

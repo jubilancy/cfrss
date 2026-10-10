@@ -17,6 +17,7 @@ import {
   handleEnableSubscription,
   handleUpdateSubscription,
 } from './handlers/subscriptions';
+import { handleDiscoverFeeds } from './handlers/feed-discovery';
 import { handleImportOPML, handleExportOPML } from './handlers/opml';
 import { handleListArticles, handleGetArticle, handleRefreshFeeds, handleUpdateReadState } from './handlers/articles';
 import {
@@ -90,6 +91,9 @@ app.get('/api/categories', handleListCategories);
 app.post('/api/categories', handleCreateCategory);
 app.put('/api/categories/:id', handleRenameCategory);
 app.delete('/api/categories/:id', handleDeleteCategory);
+
+// --- Feed finder ---
+app.post('/api/feeds/discover', handleDiscoverFeeds);
 
 // --- OPML Import/Export ---
 app.post('/api/opml/import', handleImportOPML);
