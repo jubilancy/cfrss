@@ -181,6 +181,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
     public_feed_rss: 'RSS',
     public_feed_json: 'JSON',
     public_feed_failed: 'Could not change the public feed. Please try again.',
+    public_page_footer: 'Shared from a personal reader. Titles link to the original sites.',
 
     // Loading / error states
     loading: 'Loading…',
