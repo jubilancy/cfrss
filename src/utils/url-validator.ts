@@ -3,6 +3,8 @@
  * Provides synchronous format validation and async feed probe with timeout.
  */
 
+import { extractFeedTitle, looksLikeFeed } from '../services/feed-discovery';
+
 // === Types ===
 
 export type ValidationResult =
@@ -94,18 +96,9 @@ export async function probeUrl(url: string): Promise<ProbeResult> {
 function parseFeedContent(text: string): ProbeResult {
   const trimmed = text.trim();
 
-  // Check for RSS 2.0 root element
-  const isRss = /<rss[\s>]/i.test(trimmed);
-  // Check for Atom 1.0 root element
-  const isAtom = /<feed[\s>]/i.test(trimmed);
-
-  if (!isRss && !isAtom) {
-    return { valid: false, reason: 'invalid_feed', message: 'Response is not a valid RSS 2.0 or Atom 1.0 feed' };
+  if (!looksLikeFeed(trimmed)) {
+    return { valid: false, reason: 'invalid_feed', message: 'Response is not a valid RSS, Atom or RDF feed' };
   }
 
-  // Extract title from <title> element
-  const titleMatch = trimmed.match(/<title[^>]*>(.*?)<\/title>/i);
-  const title = titleMatch?.[1]?.trim() || 'Untitled Feed';
-
-  return { valid: true, title };
+  return { valid: true, title: extractFeedTitle(trimmed) };
 }
