@@ -18,6 +18,8 @@ import {
   handleUpdateSubscription,
 } from './handlers/subscriptions';
 import { handleListRules, handleCreateRule, handleUpdateRule, handleDeleteRule, handleApplyRule } from './handlers/rules';
+
+import { handleDiscoverFeeds } from './handlers/feed-discovery';
 import { handleImportOPML, handleExportOPML } from './handlers/opml';
 import { handleListArticles, handleGetArticle, handleRefreshFeeds, handleUpdateReadState } from './handlers/articles';
 import {
@@ -98,6 +100,9 @@ app.post('/api/rules', handleCreateRule);
 app.put('/api/rules/:id', handleUpdateRule);
 app.delete('/api/rules/:id', handleDeleteRule);
 app.post('/api/rules/:id/apply', handleApplyRule);
+
+// --- Feed finder ---
+app.post('/api/feeds/discover', handleDiscoverFeeds);
 
 // --- OPML Import/Export ---
 app.post('/api/opml/import', handleImportOPML);
