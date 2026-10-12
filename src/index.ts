@@ -18,7 +18,6 @@ import {
   handleUpdateSubscription,
 } from './handlers/subscriptions';
 import { handleListRules, handleCreateRule, handleUpdateRule, handleDeleteRule, handleApplyRule } from './handlers/rules';
-
 import { handleDiscoverFeeds } from './handlers/feed-discovery';
 import { handleImportOPML, handleExportOPML } from './handlers/opml';
 import { handleListArticles, handleGetArticle, handleRefreshFeeds, handleUpdateReadState } from './handlers/articles';
