@@ -12,6 +12,7 @@
 
 import { refreshAllFeeds, type FeedRefreshFailure } from './content-fetcher';
 import { storeArticle, loadGitHubConfig, type ArticleStorageData } from './content-store';
+import { createRuleApplier } from './rules';
 import type { Env, Subscription } from '../types';
 
 export interface RefreshOutcome {
@@ -140,6 +141,11 @@ export async function refreshSubscriptionsAndStore(
   let newArticleCount = 0;
   const ghConfig = await loadGitHubConfig(db, env.ENCRYPTION_KEY);
   const urlBySubscriptionId = new Map(subscriptions.map((s) => [s.id, s.url]));
+  // Rules run on each new article; a rules problem must never stop a refresh.
+  const rules = await createRuleApplier(db).catch((error: unknown) => {
+    console.error('[CFRSS] could not load rules:', error instanceof Error ? error.message : error);
+    return null;
+  });
 
   for (const success of refreshResult.successes) {
     for (const article of success.articles) {
@@ -190,6 +196,14 @@ export async function refreshSubscriptionsAndStore(
           article.sourceUrl
         )
         .run();
+
+      if (rules) {
+        await rules
+          .apply({ id: articleId, feedId: success.subscriptionId, title: article.title, summary: article.summary ?? '' })
+          .catch((error: unknown) => {
+            console.error('[CFRSS] rules failed:', error instanceof Error ? error.message : error);
+          });
+      }
 
       // Track the URL so later articles in the same batch also get deduped
       existingUrls.add(article.sourceUrl);
