@@ -9,12 +9,10 @@ Tags, folders and public feeds are built (see Done). What is left:
 
 - **Folders and tags in the sidebar tree**, next to the feeds and categories,
   so they can be reached without opening the Library page.
-- **Rule-based folders.** Folders that fill themselves from rules, such as
-  **"everything from feed X"**. Rules could also match a tag, a keyword, or a
-  category. Hand-added folders stay as they are.
-- **More from public feeds:** a short note on the tag or folder page about who
-  can see it, and optionally a nicer human-readable view of the feed when it is
-  opened in a browser.
+- **Rules on more things.** Rules now match a feed and/or a keyword. Still to
+  add: matching a tag or a category, and "remove from folder" actions.
+- **Public page polish:** a short note on the tag or folder page about who can
+  see it.
 
 ## Domain and URLs
 
@@ -60,9 +58,6 @@ Tags, folders and public feeds are built (see Done). What is left:
   SVG or PNG of the sun.
 - **Manifest theme color.** Still the old blue; the interface is now terracotta.
 
-- **Working preview builds.** Previews have no app JavaScript, so they show a
-  blank page. Fix: in the Worker's Settings, Builds, set the Build command to
-  `npm run build:client`.
 - **Update the CI workflow's Node version.** GitHub warns Node 20 is
   deprecated for the checkout and setup-node actions.
 - **Auto-delete merged branches.** Repo Settings, General, Pull Requests,
@@ -89,6 +84,15 @@ Tags, folders and public feeds are built (see Done). What is left:
   one (konpeito does this).
 
 ## Done
+
+- **Feed finder.** Paste a website address and the app finds its feeds (and
+  checks pasted feed addresses), then subscribes in one click.
+- **Rules** (Settings → Rules). Match a feed and/or a keyword; add a tag, file
+  into a folder, or mark read. Runs on new articles, and "Apply to existing"
+  covers the newest 500. This makes rule-based folders work ("everything from
+  feed X").
+- **Public page for shared folders and tags.** Visitors without a login see a
+  readable page for a public tag or folder.
 
 - **Clean slash URLs** instead of `#/`: `/articles`, `/feed/:id`,
   `/category/:id`, `/library`, `/tag/cooking`, `/TBR`. Old `#/` links
