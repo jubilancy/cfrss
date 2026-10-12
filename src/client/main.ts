@@ -10,6 +10,8 @@ import { LoginGate, getStoredToken, clearStoredToken, verifyToken } from './comp
 import { installFetchAuth } from './services/api.js';
 import { initPWA } from './services/pwa.js';
 import { initTheme } from './services/theme.js';
+import { parsePath } from './router.js';
+import { PublicCollectionView, publicFeedPath, type PublicFeedData } from './components/collection/PublicCollectionView.js';
 import { initI18n } from './services/i18n.js';
 
 /**
@@ -47,6 +49,25 @@ function showLogin(appEl: HTMLElement): void {
 }
 
 /**
+ * A visitor who is not signed in, on a folder or tag address, sees the public
+ * page when that folder or tag is public. Returns true when it was shown.
+ */
+async function showPublicPage(appEl: HTMLElement): Promise<boolean> {
+  const route = parsePath(window.location.pathname);
+  if (route.path !== 'folder' && route.path !== 'tag') return false;
+  try {
+    const res = await fetch(publicFeedPath(window.location.pathname), { headers: { Accept: 'application/feed+json' } });
+    if (!res.ok) return false;
+    const data = (await res.json()) as PublicFeedData;
+    appEl.innerHTML = '';
+    new PublicCollectionView(appEl, data, window.location.pathname, () => showLogin(appEl));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Bootstrap the application: authenticate first, then start the app shell.
  */
 function bootstrap(): void {
@@ -70,7 +91,9 @@ function bootstrap(): void {
       }
     });
   } else {
-    showLogin(appEl);
+    void showPublicPage(appEl).then((shown) => {
+      if (!shown) showLogin(appEl);
+    });
   }
 }
 

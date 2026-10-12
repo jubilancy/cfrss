@@ -213,6 +213,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
     rules_applied: 'Matched / checked',
     rules_delete_confirm: 'Delete this rule? Articles it already changed stay as they are.',
     rules_load_failed: 'Could not load rules. Please try again.',
+    public_page_footer: 'Shared from a personal reader. Titles link to the original sites.',
 
     // Loading / error states
     loading: 'Loading…',
