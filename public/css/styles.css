@@ -3791,3 +3791,103 @@ html, body {
   font-size: 12px;
   color: var(--color-text-muted);
 }
+
+/* Rules panel in Settings */
+.rules-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.rules-panel__hint,
+.rules-panel__empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.rules-panel__list {
+  display: grid;
+  gap: 8px;
+}
+
+.rule-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.rule-row--off .rule-row__text {
+  opacity: 0.55;
+}
+
+.rule-row__text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.rules-panel__form {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.rules-panel__form h4 {
+  margin: 0;
+  font-family: var(--font-serif);
+}
+
+.rules-panel__form fieldset {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.rules-panel__form legend {
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.rules-panel__field {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.rules-panel__field input[type='text'],
+.rules-panel__field select {
+  padding: 8px 10px;
+  font: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.rules-panel__field input[type='checkbox'] {
+  justify-self: start;
+}
+
+.rules-panel__message {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}

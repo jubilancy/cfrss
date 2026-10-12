@@ -900,3 +900,53 @@ export async function removeArticleFromFolder(folderId: string, articleId: strin
     `/api/folders/${encodeURIComponent(folderId)}/articles/${encodeURIComponent(articleId)}`
   );
 }
+
+// === Rules ===
+
+export interface RuleInfo {
+  id: string;
+  name: string;
+  feedId: string | null;
+  matchField: 'title' | 'any';
+  contains: string | null;
+  addTag: string | null;
+  folderId: string | null;
+  markRead: boolean;
+  enabled: boolean;
+  order: number;
+}
+
+export interface RuleDraft {
+  name?: string;
+  feedId?: string | null;
+  matchField?: 'title' | 'any';
+  contains?: string | null;
+  addTag?: string | null;
+  folderId?: string | null;
+  markRead?: boolean;
+  enabled?: boolean;
+}
+
+export async function getRules(): Promise<RuleInfo[]> {
+  const data = await apiRequest<{ rules: RuleInfo[] }>('GET', '/api/rules');
+  return data.rules;
+}
+
+export async function createRule(draft: RuleDraft): Promise<RuleInfo> {
+  const data = await apiRequest<{ rule: RuleInfo }>('POST', '/api/rules', draft);
+  return data.rule;
+}
+
+export async function updateRule(id: string, draft: RuleDraft): Promise<RuleInfo> {
+  const data = await apiRequest<{ rule: RuleInfo }>('PUT', `/api/rules/${encodeURIComponent(id)}`, draft);
+  return data.rule;
+}
+
+export async function deleteRule(id: string): Promise<void> {
+  await apiRequest<{ success: boolean }>('DELETE', `/api/rules/${encodeURIComponent(id)}`);
+}
+
+/** Run a rule on existing articles. Returns how many were checked and matched. */
+export async function applyRule(id: string): Promise<{ checked: number; matched: number }> {
+  return apiRequest('POST', `/api/rules/${encodeURIComponent(id)}/apply`);
+}

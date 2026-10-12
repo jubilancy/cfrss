@@ -17,6 +17,7 @@ import {
   handleEnableSubscription,
   handleUpdateSubscription,
 } from './handlers/subscriptions';
+import { handleListRules, handleCreateRule, handleUpdateRule, handleDeleteRule, handleApplyRule } from './handlers/rules';
 import { handleImportOPML, handleExportOPML } from './handlers/opml';
 import { handleListArticles, handleGetArticle, handleRefreshFeeds, handleUpdateReadState } from './handlers/articles';
 import {
@@ -90,6 +91,13 @@ app.get('/api/categories', handleListCategories);
 app.post('/api/categories', handleCreateCategory);
 app.put('/api/categories/:id', handleRenameCategory);
 app.delete('/api/categories/:id', handleDeleteCategory);
+
+// --- Rules ---
+app.get('/api/rules', handleListRules);
+app.post('/api/rules', handleCreateRule);
+app.put('/api/rules/:id', handleUpdateRule);
+app.delete('/api/rules/:id', handleDeleteRule);
+app.post('/api/rules/:id/apply', handleApplyRule);
 
 // --- OPML Import/Export ---
 app.post('/api/opml/import', handleImportOPML);

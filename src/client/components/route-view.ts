@@ -21,6 +21,7 @@ import { LLMConfigPanel } from './settings/LLMConfigPanel.js';
 import { GitHubConfigPanel } from './settings/GitHubConfigPanel.js';
 import { TTSConfigPanel } from './settings/TTSConfigPanel.js';
 import { PasswordPanel } from './settings/PasswordPanel.js';
+import { RulesPanel } from './settings/RulesPanel.js';
 
 interface Mountable {
   destroy(): void;
@@ -216,6 +217,7 @@ export class RouteView {
     }> = [
       { icon: '🎨', titleKey: 'theme', descKey: 'settings_theme_desc', component: new ThemeToggle() },
       { icon: '🤖', titleKey: 'llm_config', descKey: 'settings_llm_desc', component: new LLMConfigPanel() },
+      { icon: '🧹', titleKey: 'rules', descKey: 'settings_rules_desc', component: new RulesPanel() },
       { icon: '🔊', titleKey: 'tts_config', descKey: 'settings_tts_desc', component: new TTSConfigPanel() },
       { icon: '🐙', titleKey: 'github_config', descKey: 'settings_github_desc', component: new GitHubConfigPanel() },
       { icon: '🔒', titleKey: 'password', descKey: 'settings_password_desc', component: new PasswordPanel() },

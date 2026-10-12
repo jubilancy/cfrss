@@ -98,6 +98,22 @@ export async function setupTestDatabase(db: D1Database): Promise<void> {
       FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS rules (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      feed_id TEXT,
+      match_field TEXT NOT NULL DEFAULT 'title' CHECK(match_field IN ('title', 'any')),
+      contains TEXT,
+      add_tag TEXT,
+      folder_id TEXT,
+      mark_read INTEGER NOT NULL DEFAULT 0,
+      enabled INTEGER NOT NULL DEFAULT 1,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (feed_id) REFERENCES subscriptions(id) ON DELETE CASCADE,
+      FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS llm_configs (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
