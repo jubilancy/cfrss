@@ -173,7 +173,7 @@ export class RulesPanel {
     title.textContent = t('rules_new');
     form.appendChild(title);
 
-    const field = (label: string, control: HTMLElement): HTMLElement => {
+    const field = (label: string, control: Node): HTMLElement => {
       const wrap = document.createElement('label');
       wrap.className = 'rules-panel__field';
       const span = document.createElement('span');
